@@ -1,0 +1,35 @@
+name: RDP
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 3600
+
+    steps:
+      - name: Download Tailscale
+        run: |
+          curl -O https://pkgs.tailscale.com/stable/tailscale-setup-latest.exe
+          Start-Process -FilePath "tailscale-setup-latest.exe" -ArgumentList "/quiet", "/norestart" -Wait
+
+      - name: Connect to Tailscale
+        run: |
+          & "C:\Program Files\Tailscale\tailscale.exe" up --authkey ${{ secrets.TAILSCALE_AUTH_KEY }}
+
+      - name: RDP Connection Details
+        run: |
+          Write-Host "RDP is Ready!"
+          Write-Host "Address: Your Tailscale IP"
+          Write-Host "Username: runneradmin"
+          Write-Host "Password: No Password (or set one)"
+
+      - name: Keep Alive
+        run: |
+          $n = 60
+          while($n -gt 0) {
+            Write-Host "Remaining time: $n hours"
+            Start-Sleep -Seconds 3600
+            $n--
+          }
