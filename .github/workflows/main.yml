@@ -8,11 +8,13 @@ jobs:
       - name: Setup Tailscale
         shell: powershell
         run: |
+          Set-ExecutionPolicy RemoteSigned -Scope Process -Force
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
           Invoke-WebRequest -Uri "https://pkgs.tailscale.com/stable/tailscale-setup-latest.exe" -OutFile "tailscale-setup.exe"
           Start-Process -FilePath "tailscale-setup.exe" -ArgumentList "/quiet", "/norestart" -Wait
           & "C:\Program Files\Tailscale\tailscale.exe" up --authkey ${{ secrets.TAILSCALE_AUTH_KEY }}
           
-      - name: Create User
+      - name: Set Password
         run: |
           net user runneradmin Panda123! /add
           net localgroup administrators runneradmin /add
@@ -22,4 +24,3 @@ jobs:
           Write-Host "PC is Ready!"
           $n = 360
           while($n -gt 0) { Start-Sleep -Seconds 60; $n-- }
-
